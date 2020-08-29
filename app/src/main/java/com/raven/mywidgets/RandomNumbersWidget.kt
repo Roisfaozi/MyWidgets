@@ -17,6 +17,24 @@ class RandomNumbersWidget : AppWidgetProvider() {
         private const val WIDGET_ID_EXTRA = "widget_id_extra"
     }
 
+    internal fun updateAppWidget(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int
+    ) {
+
+        // Construct the RemoteViews object
+        val views = RemoteViews(context.packageName, R.layout.random_numbers_widget)
+        val lastUpdate = "Random:" + NumberGenerator.generate(100)
+        views.setTextViewText(R.id.appwidget_text, lastUpdate)
+        views.setOnClickPendingIntent(R.id.btn_click, getPendingSelfIntent(context, appWidgetId, WIDGET_CLICK))
+
+        // Instruct the widget manager to update the widget
+        appWidgetManager.updateAppWidget(appWidgetId, views)
+
+
+    }
+
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -48,28 +66,10 @@ class RandomNumbersWidget : AppWidgetProvider() {
         }
     }
 
-    override fun onPendingSelfIntent(context: Context, appWidgetId: Int, action: String){
+    private fun getPendingSelfIntent(context: Context, appWidgetId: Int, action: String) : PendingIntent{
         val intent = Intent(context, javaClass)
         intent.action = action
         intent.putExtra(WIDGET_ID_EXTRA, appWidgetId)
         return PendingIntent.getBroadcast(context, appWidgetId, intent, 0)
     }
-}
-
-internal fun updateAppWidget(
-    context: Context,
-    appWidgetManager: AppWidgetManager,
-    appWidgetId: Int
-) {
-    
-    // Construct the RemoteViews object
-    val views = RemoteViews(context.packageName, R.layout.random_numbers_widget)
-    val lastUpdate = "Random:" + NumberGenerator.generate(100)
-    views.setTextViewText(R.id.appwidget_text, lastUpdate)
-    views.setOnClickPendingIntent(R.id.btn_click, getPendingSelfIntent(context, appWidgetId,  WIDGET_CLICK))
-
-    // Instruct the widget manager to update the widget
-    appWidgetManager.updateAppWidget(appWidgetId, views)
-
-
 }
